@@ -46,3 +46,13 @@ clean:
 	$(RM) $(deps)
 
 -include $(deps)
+
+bench: $(TESTS)
+	echo 3 | sudo tee /proc/sys/vm/drop_caches
+	perf stat --repeat 100 \
+		-e cache-misses,cache-references,instructions,cycles \
+		./test_cpy --bench cmd.txt
+	echo 3 | sudo tee /proc/sys/vm/drop_caches
+	perf stat --repeat 100 \
+		-e cache-misses,cache-references,instructions,cycles \
+		./test_ref --bench cmd.txt
